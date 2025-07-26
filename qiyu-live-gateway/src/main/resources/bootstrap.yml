@@ -1,0 +1,28 @@
+server:
+  port: 80
+spring:
+  application:
+    name: qiyu-live-gateway
+  cloud:
+    nacos:
+      username: qiyu
+      password: qiyu
+      discovery:
+        server-addr: 192.168.142.128:8848
+        namespace: c539b406-1e2b-4d4e-a611-d3a28a756871
+      config:
+        import-check:
+          enabled: false
+        # 当前服务启动后去 nacos 中读取配置文件的后缀
+        file-extension: yaml
+        # 读取配置的 nacos 地址
+        server-addr: 192.168.142.128:8848
+        # 读取配置的 nacos 的名空间
+        namespace: c539b406-1e2b-4d4e-a611-d3a28a756871
+  config:
+    import:
+      - optional:nacos:qiyu-live-gateway.yaml
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty.http.client: DEBUG

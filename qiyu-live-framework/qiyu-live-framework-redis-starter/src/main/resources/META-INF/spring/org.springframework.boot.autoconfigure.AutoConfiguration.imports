@@ -1,0 +1,5 @@
+org.qiyu.live.framework.redis.starter.config.RedisConfig
+org.qiyu.live.framework.redis.starter.key.UserProviderCacheKeyBuilder
+org.qiyu.live.framework.redis.starter.key.OtherProviderCacheKeyBuilder
+org.qiyu.live.framework.redis.starter.key.MsgProviderCacheKeyBuilder
+org.qiyu.live.framework.redis.starter.key.AccountProviderCacheKeyBuilder
