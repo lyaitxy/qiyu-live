@@ -13,6 +13,6 @@ public class ImMsgEncoder extends MessageToByteEncoder {
         out.writeInt(imMsg.getCode());
         out.writeInt(imMsg.getLen());
         out.writeBytes(imMsg.getBody());
-        channelHandlerContext.writeAndFlush(out);
+//        channelHandlerContext.writeAndFlush(out);
     }
 }

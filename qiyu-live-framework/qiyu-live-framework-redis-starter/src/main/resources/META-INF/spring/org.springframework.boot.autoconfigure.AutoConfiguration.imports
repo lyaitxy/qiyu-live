@@ -3,3 +3,4 @@ org.qiyu.live.framework.redis.starter.key.UserProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.OtherProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.MsgProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.AccountProviderCacheKeyBuilder
+org.qiyu.live.framework.redis.starter.key.ImProviderCacheKeyBuilder

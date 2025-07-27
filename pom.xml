@@ -21,6 +21,7 @@
     <module>qiyu-live-account-interface</module>
     <module>qiyu-live-im-interface</module>
     <module>qiyu-live-im-core-server</module>
+      <module>qiyu-live-im-provider</module>
   </modules>
 
   <properties>
