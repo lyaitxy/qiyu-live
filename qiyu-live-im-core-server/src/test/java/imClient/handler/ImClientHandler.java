@@ -20,6 +20,9 @@ import org.qiyu.live.im.interfaces.ImTokenRpc;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @ChannelHandler.Sharable
 public class ImClientHandler implements InitializingBean {
@@ -45,23 +48,42 @@ public class ImClientHandler implements InitializingBean {
                         channel.pipeline().addLast(new ClientHandler());
                     }
                 });
-                ChannelFuture channelFuture = null;
-                try {
-                    channelFuture = bootstrap.connect("localhost", 8085).sync();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                Long userId = 11113L;
-                Channel channel = channelFuture.channel();
-                for (int i = 0; i < 100; i++) {
+                //测试代码段1：建立连接并保存channel
+                Map<Long, Channel> userIdChannelMap = new HashMap<>();
+                for (int i = 0; i < 10; i++) {
+                    Long userId = 10000L + i;
+                    ChannelFuture channelFuture = null;
+                    try {
+                        channelFuture = bootstrap.connect("localhost", 8085).sync();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Channel channel = channelFuture.channel();
                     String token = imTokenRpc.createImLoginToken(userId, AppIdEnum.QIYU_LIVE_BIZ.getCode());
                     ImMsgBody imMsgBody = new ImMsgBody();
                     imMsgBody.setUserId(userId);
                     imMsgBody.setAppId(AppIdEnum.QIYU_LIVE_BIZ.getCode());
                     imMsgBody.setToken(token);
                     channel.writeAndFlush(ImMsg.build(ImMsgCodeEnum.IM_LOGIN_MSG.getCode(), JSON.toJSONString(imMsgBody)));
+                    userIdChannelMap.put(userId, channel);
+                }
+
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                //测试代码段2：持续发送心跳包
+                while (true) {
+                    for (Long userId : userIdChannelMap.keySet()) {
+                        ImMsgBody heartBeatBody = new ImMsgBody();
+                        heartBeatBody.setUserId(userId);
+                        heartBeatBody.setAppId(AppIdEnum.QIYU_LIVE_BIZ.getCode());
+                        ImMsg heartBeatMsg = ImMsg.build(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), JSON.toJSONString(heartBeatBody));
+                        userIdChannelMap.get(userId).writeAndFlush(heartBeatMsg);
+                    }
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

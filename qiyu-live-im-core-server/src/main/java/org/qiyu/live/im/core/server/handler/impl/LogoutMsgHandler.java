@@ -2,21 +2,32 @@ package org.qiyu.live.im.core.server.handler.impl;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
+import jakarta.annotation.Resource;
+import org.qiyu.live.framework.redis.starter.key.ImCoreServerProviderCacheKeyBuilder;
 import org.qiyu.live.im.constants.ImMsgCodeEnum;
 import org.qiyu.live.im.core.server.common.ChannelHandlerContextCache;
 import org.qiyu.live.im.core.server.common.ImContextUtils;
 import org.qiyu.live.im.core.server.common.ImMsg;
 import org.qiyu.live.im.core.server.handler.SimpleHandler;
 import org.qiyu.live.im.dto.ImMsgBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import static com.alibaba.nacos.client.utils.EnvUtil.LOGGER;
 
 /**
  * 登录消息处理器
  */
 @Component
 public class LogoutMsgHandler implements SimpleHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutMsgHandler.class);
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private ImCoreServerProviderCacheKeyBuilder cacheKeyBuilder;
+
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsg imMsg) {
         Long userId = ImContextUtils.getUserId(ctx);
@@ -38,6 +49,8 @@ public class LogoutMsgHandler implements SimpleHandler {
         ChannelHandlerContextCache.remove(userId);
         ImContextUtils.removeUserId(ctx);
         ImContextUtils.removeAppId(ctx);
+        // 删除心跳包存活缓存
+        redisTemplate.delete(cacheKeyBuilder.buildImLoginTokenKey(userId, appId));
         ctx.close();
     }
 }
