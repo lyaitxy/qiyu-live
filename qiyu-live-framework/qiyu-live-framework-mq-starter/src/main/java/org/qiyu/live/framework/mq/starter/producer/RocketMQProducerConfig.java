@@ -1,4 +1,4 @@
-package org.qiyu.live.user.provider.config;
+package org.qiyu.live.framework.mq.starter.producer;
 
 import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.exception.MQClientException;

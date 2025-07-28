@@ -30,15 +30,15 @@ public class MsgProviderApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        String phoneStr = "17665753022";
-        MsgSendResultEnum msgSendResultEnum = smsService.sendLoginCode(phoneStr);
-        System.out.println(msgSendResultEnum);
-        while(true) {
-            System.out.println("输出验证码：");
-            Scanner scanner = new Scanner(System.in);
-            int code = scanner.nextInt();
-            MsgCheckDTO checkStatus = smsService.checkLoginCode(phoneStr, code);
-            System.out.println(checkStatus);
-        }
+//        String phoneStr = "17665753022";
+//        MsgSendResultEnum msgSendResultEnum = smsService.sendLoginCode(phoneStr);
+//        System.out.println(msgSendResultEnum);
+//        while(true) {
+//            System.out.println("输出验证码：");
+//            Scanner scanner = new Scanner(System.in);
+//            int code = scanner.nextInt();
+//            MsgCheckDTO checkStatus = smsService.checkLoginCode(phoneStr, code);
+//            System.out.println(checkStatus);
+//        }
     }
 }

@@ -1,6 +1,7 @@
 package imClient.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import imClient.ClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -73,17 +74,22 @@ public class ImClientHandler implements InitializingBean {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                //测试代码段2：持续发送心跳包
+                //测试代码段2：持续发送业务消息包
                 while (true) {
                     for (Long userId : userIdChannelMap.keySet()) {
-                        ImMsgBody heartBeatBody = new ImMsgBody();
-                        heartBeatBody.setUserId(userId);
-                        heartBeatBody.setAppId(AppIdEnum.QIYU_LIVE_BIZ.getCode());
-                        ImMsg heartBeatMsg = ImMsg.build(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), JSON.toJSONString(heartBeatBody));
-                        userIdChannelMap.get(userId).writeAndFlush(heartBeatMsg);
+                        ImMsgBody bizBody = new ImMsgBody();
+                        bizBody.setUserId(userId);
+                        bizBody.setAppId(AppIdEnum.QIYU_LIVE_BIZ.getCode());
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("userId", userId);
+                        jsonObject.put("objectId", 100001L);
+                        jsonObject.put("content", "你好，我是" + userId);
+                        bizBody.setData(JSON.toJSONString(jsonObject));
+                        ImMsg bizMsg = ImMsg.build(ImMsgCodeEnum.IM_BIZ_MSG.getCode(), JSON.toJSONString(bizBody));
+                        userIdChannelMap.get(userId).writeAndFlush(bizMsg);
                     }
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }

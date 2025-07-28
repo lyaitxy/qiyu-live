@@ -1,4 +1,4 @@
-package org.qiyu.live.user.provider.config;
+package org.qiyu.live.framework.mq.starter.consumer;
 
 import com.alibaba.fastjson.JSON;
 import jakarta.annotation.Resource;
@@ -13,7 +13,6 @@ import org.qiyu.live.framework.redis.starter.key.UserProviderCacheKeyBuilder;
 import org.qiyu.live.user.interfaces.constants.CacheAsyncDeleteCode;
 import org.qiyu.live.user.interfaces.constants.UserProviderTopicNames;
 import org.qiyu.live.user.interfaces.dto.UserCacheAsyncDeleteDTO;
-import org.qiyu.live.user.interfaces.dto.UserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,7 +22,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import java.util.List;
 
 @Configuration
-public class RocketMQConsumerConfig implements InitializingBean {
+public class DeleteCodeConsumer implements InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(RocketMQConsumerConfig.class);
 
     @Resource

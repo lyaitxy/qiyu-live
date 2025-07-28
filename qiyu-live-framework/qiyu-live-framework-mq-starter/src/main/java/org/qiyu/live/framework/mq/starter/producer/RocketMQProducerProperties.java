@@ -1,4 +1,4 @@
-package org.qiyu.live.user.provider.config;
+package org.qiyu.live.framework.mq.starter.producer;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
