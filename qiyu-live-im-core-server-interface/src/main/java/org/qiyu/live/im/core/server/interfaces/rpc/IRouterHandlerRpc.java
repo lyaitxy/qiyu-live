@@ -1,0 +1,14 @@
+package org.qiyu.live.im.core.server.interfaces.rpc;
+
+import org.qiyu.live.im.dto.ImMsgBody;
+
+/**
+ * 专门给Router层的服务进行调用接口
+ */
+public interface IRouterHandlerRpc {
+
+    /**
+     * 按照用户id进行消息发送
+     */
+    void sendMsg(ImMsgBody imMsgBody);
+}
