@@ -9,10 +9,12 @@ import org.qiyu.live.im.core.server.common.ChannelHandlerContextCache;
 import org.qiyu.live.im.core.server.common.ImContextUtils;
 import org.qiyu.live.im.core.server.common.ImMsg;
 import org.qiyu.live.im.core.server.handler.SimpleHandler;
+import org.qiyu.live.im.core.server.interfaces.constants.ImCoreServerConstants;
 import org.qiyu.live.im.dto.ImMsgBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,6 +27,8 @@ public class LogoutMsgHandler implements SimpleHandler {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
     @Resource
     private ImCoreServerProviderCacheKeyBuilder cacheKeyBuilder;
 
@@ -46,6 +50,8 @@ public class LogoutMsgHandler implements SimpleHandler {
         ctx.writeAndFlush(ImMsg.build(ImMsgCodeEnum.IM_LOGOUT_MSG.getCode(), JSON.toJSONString(respBody)));
         LOGGER.info("[LogoutMsgHandler] logout success, userId is {}, appId is {}", userId, appId);
         //理想情况下：客户端短线的时候发送短线消息包
+        // 删除供Router取出的存在Redis的IM服务器的ip+端口地址
+        stringRedisTemplate.delete(ImCoreServerConstants.IM_BIND_IP_KEY + appId +":" + userId);
         ChannelHandlerContextCache.remove(userId);
         ImContextUtils.removeUserId(ctx);
         ImContextUtils.removeAppId(ctx);

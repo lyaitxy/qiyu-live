@@ -4,5 +4,5 @@ import org.qiyu.live.im.dto.ImMsgBody;
 
 public interface ImRouterService {
 
-    boolean sendMsg(Long userId, ImMsgBody imMsgBody);
+    boolean sendMsg(ImMsgBody imMsgBody);
 }

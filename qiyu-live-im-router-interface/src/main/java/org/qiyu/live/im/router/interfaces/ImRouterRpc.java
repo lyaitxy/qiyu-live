@@ -7,5 +7,5 @@ public interface ImRouterRpc {
     /**
      * 按照用户id进行消息的发送
      */
-    boolean sendMsg(Long userId, ImMsgBody imMsgBody);
+    boolean sendMsg(ImMsgBody imMsgBody);
 }
