@@ -23,7 +23,7 @@ import java.util.List;
 
 @Configuration
 public class DeleteCodeConsumer implements InitializingBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RocketMQConsumerConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteCodeConsumer.class);
 
     @Resource
     private RocketMQConsumerProperties consumerProperties;

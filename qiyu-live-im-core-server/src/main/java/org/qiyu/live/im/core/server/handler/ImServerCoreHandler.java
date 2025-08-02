@@ -3,17 +3,24 @@ package org.qiyu.live.im.core.server.handler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import jakarta.annotation.Resource;
 import org.qiyu.live.im.core.server.common.ChannelHandlerContextCache;
 import org.qiyu.live.im.core.server.common.ImContextAttr;
+import org.qiyu.live.im.core.server.common.ImContextUtils;
 import org.qiyu.live.im.core.server.common.ImMsg;
 import org.qiyu.live.im.core.server.handler.impl.ImHandlerFactoryImpl;
+import org.qiyu.live.im.core.server.interfaces.constants.ImCoreServerConstants;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 @ChannelHandler.Sharable  // 声明这个Handler是线程安全的，可以被多个Channel共享使用
 public class ImServerCoreHandler extends SimpleChannelInboundHandler {
 
-    private ImHandlerFactory imHandlerFactory = new ImHandlerFactoryImpl();
+    @Resource
+    private ImHandlerFactory imHandlerFactory;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object msg) throws Exception {
@@ -31,7 +38,11 @@ public class ImServerCoreHandler extends SimpleChannelInboundHandler {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Long userId = ctx.attr(ImContextAttr.USER_ID).get();
-        ChannelHandlerContextCache.remove(userId);
+        Long userId = ImContextUtils.getUserId(ctx);
+        Integer appId = ImContextUtils.getAppId(ctx);
+        if(userId != null && appId != null) {
+            ChannelHandlerContextCache.remove(userId);
+            redisTemplate.delete(ImCoreServerConstants.IM_BIND_IP_KEY + appId + ":" + userId);
+        }
     }
 }
