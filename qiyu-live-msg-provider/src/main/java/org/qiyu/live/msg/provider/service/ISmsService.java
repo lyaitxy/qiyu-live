@@ -5,14 +5,14 @@ import org.qiyu.live.msg.enums.MsgSendResultEnum;
 
 public interface ISmsService {
     /**
-     * 发送短信呢验证码接口
+     * 发送短信呢验证码接口,使用random随机产生验证码
      * @param phone
      * @return
      */
     MsgSendResultEnum sendLoginCode(String phone);
 
     /**
-     * 校验登录验证码
+     * 校验登录验证码, 使用phone生成redis的key，存入code，再与用户传入的code进行对比
      * @param phone
      * @param code
      * @return

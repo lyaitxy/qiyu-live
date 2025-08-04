@@ -21,10 +21,12 @@ public class ImRouterServiceImpl implements ImRouterService {
 
     @Override
     public boolean sendMsg(ImMsgBody imMsgBody) {
+        // bindAddress是dubbo的地址和端口
         String bindAddress = stringRedisTemplate.opsForValue().get(ImCoreServerConstants.IM_BIND_IP_KEY + imMsgBody.getAppId() + ":" + imMsgBody.getUserId());
         if(StringUtils.isEmpty(bindAddress)) {
             return false;
         }
+        // RpcContext是线程级上下文对象,用于在消费者和服务提供者之间传递隐式信息
         RpcContext.getContext().set("ip", bindAddress);
         routerHandlerRpc.sendMsg(imMsgBody);
         return true;

@@ -24,6 +24,10 @@ public class ImMsgBody implements Serializable {
      */
     private int bizCode;
     /**
+     * 唯一的消息id标识
+     */
+    private String msgId;
+    /**
      * 和业务服务进行消息传递
      */
     private String data;
@@ -66,5 +70,13 @@ public class ImMsgBody implements Serializable {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
     }
 }

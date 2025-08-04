@@ -26,6 +26,11 @@ public class ChannelHandlerContextCache {
         return channelHandlerContextMap.get(userId);
     }
 
+    /**
+     * 存储对应用户的的ctx
+     * @param userId
+     * @param channelHandlerContext
+     */
     public static void put(Long userId, ChannelHandlerContext channelHandlerContext) {
         channelHandlerContextMap.put(userId, channelHandlerContext);
     }

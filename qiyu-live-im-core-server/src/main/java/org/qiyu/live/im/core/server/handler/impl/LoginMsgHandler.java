@@ -43,7 +43,7 @@ public class LoginMsgHandler implements SimpleHandler {
      */
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsg imMsg) {
-        // 防止重复连接，若已经连接就不再接受login请求包
+        // 防止重复连接，若已经连接就不再接受login请求包，当前
         if (ImContextUtils.getUserId(ctx) != null) {
             return;
         }

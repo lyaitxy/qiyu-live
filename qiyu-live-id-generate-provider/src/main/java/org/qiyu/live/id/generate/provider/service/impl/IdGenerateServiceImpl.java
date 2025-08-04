@@ -145,6 +145,7 @@ public class IdGenerateServiceImpl implements IdGenerateService, InitializingBea
     // bean初始化的回调方法
     @Override
     public void afterPropertiesSet() throws Exception {
+        // 查找数据库中的所有记录
         List<IdGeneratePO> idGeneratePOS = idGenerateMapper.selectAll();
         for (IdGeneratePO idGeneratePO : idGeneratePOS) {
             LOGGER.info("服务刚启动，抢占新的id段");

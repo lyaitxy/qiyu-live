@@ -1,5 +1,8 @@
 package org.qiyu.live.msg.enums;
 
+/**
+ * msg模块的消息发送结果枚举
+ */
 public enum MsgSendResultEnum {
 
     SEND_SUCCESS(0,"成功"),

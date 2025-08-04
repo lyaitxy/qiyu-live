@@ -15,6 +15,12 @@ public interface IdGenerateMapper extends BaseMapper<IdGeneratePO> {
     @Select("select * from t_id_generate_config")
     List<IdGeneratePO> selectAll();
 
+    /**
+     * 将当前记录的开始值和结束值都加上步长
+     * @param id
+     * @param version
+     * @return
+     */
     @Update("UPDATE t_id_generate_config SET next_threshold=next_threshold+step, \n" +
             "\tcurrent_start = current_start + step, \n" +
             "\t`version` = `version` + 1\n" +

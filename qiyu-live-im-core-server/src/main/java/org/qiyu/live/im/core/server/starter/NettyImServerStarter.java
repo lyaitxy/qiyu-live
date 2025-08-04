@@ -38,6 +38,7 @@ public class NettyImServerStarter implements InitializingBean {
 
     //基于Netty去启动一个java进程，绑定监听的端口
     public void startApplication() throws InterruptedException {
+        // 每个EventLoop内部都维护着一个selector
         //处理accept事件
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         //处理read&write事件
@@ -75,10 +76,10 @@ public class NettyImServerStarter implements InitializingBean {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }));
-
+        // 增加sync是同步等待绑定完成，阻塞当前线程直到绑定成功,否则是异步调用，主线程会继续走下去，还没绑定成功程序就已经走到下一步了
         ChannelFuture channelFuture = bootstrap.bind(port).sync();
         LOGGER.info("Netty服务启动成功，监听端口为{}", port);
-        //这里会阻塞主线程，实现服务长期开启的效果
+        //这里会阻塞主线程，实现服务长期开启的效果，同步等待通道关闭
         channelFuture.channel().closeFuture().sync();
     }
 

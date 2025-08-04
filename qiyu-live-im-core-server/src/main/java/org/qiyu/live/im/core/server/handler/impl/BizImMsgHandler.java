@@ -26,7 +26,7 @@ public class BizImMsgHandler implements SimpleHandler {
 
     @Override
     public void handler(ChannelHandlerContext ctx, ImMsg imMsg) {
-        // 参数校验
+        // 参数校验，在登陆时已经存入了
         Long userId = ImContextUtils.getUserId(ctx);
         Integer appId = ImContextUtils.getAppId(ctx);
         if (userId == null || appId == null) {
@@ -42,6 +42,7 @@ public class BizImMsgHandler implements SimpleHandler {
         }
 
         Message message = new Message();
+        // 将消息投递给消费者
         message.setTopic(ImCoreServerProviderTopicNames.QIYU_LIVE_IM_BIZ_MSG_TOPIC);
         message.setBody(body);
         try {

@@ -2,13 +2,8 @@ package org.qiyu.live.user.provider;
 
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
-import org.qiyu.live.common.interfaces.utils.IpLogConversionRule;
-import org.qiyu.live.user.interfaces.constants.UserTagsEnum;
-import org.qiyu.live.user.interfaces.dto.UserDTO;
 import org.qiyu.live.user.interfaces.dto.UserLoginDTO;
 import org.qiyu.live.user.provider.service.IUserPhoneService;
-import org.qiyu.live.user.provider.service.IUserService;
-import org.qiyu.live.user.provider.service.IUserTagService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

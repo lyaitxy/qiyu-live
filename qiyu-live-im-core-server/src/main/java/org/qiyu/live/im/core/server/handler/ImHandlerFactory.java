@@ -4,7 +4,7 @@ import io.netty.channel.ChannelHandlerContext;
 import org.qiyu.live.im.core.server.common.ImMsg;
 
 /**
- * 简单工厂模式
+ * 简单工厂模式，将其注入Spring，
  */
 public interface ImHandlerFactory {
     /**

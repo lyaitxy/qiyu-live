@@ -31,11 +31,12 @@ public class ImHandlerFactoryImpl implements ImHandlerFactory, InitializingBean 
         simpleHandlerMap.put(ImMsgCodeEnum.IM_LOGOUT_MSG.getCode(), applicationContext.getBean(LogoutMsgHandler.class));
         simpleHandlerMap.put(ImMsgCodeEnum.IM_BIZ_MSG.getCode(), applicationContext.getBean(BizImMsgHandler.class));
         simpleHandlerMap.put(ImMsgCodeEnum.IM_HEARTBEAT_MSG.getCode(), applicationContext.getBean(HeartBeatImMsgHandler.class));
+        simpleHandlerMap.put(ImMsgCodeEnum.IM_ACK_MSG.getCode(), applicationContext.getBean(AckImMsgHandler.class));
     }
 
     @Override
     public void doMsgHandler(ChannelHandlerContext ctx, ImMsg imMsg) {
-        // 得到对应的消息处理器
+        // 得到对应的消息处理器，根据消息类型选择
         SimpleHandler simpleHandler = simpleHandlerMap.get(imMsg.getCode());
         if(simpleHandler == null) {
             throw new IllegalArgumentException("msg code is error, code is :" + imMsg.getCode());

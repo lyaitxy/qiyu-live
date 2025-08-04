@@ -6,6 +6,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * 在日志命令的文件中加上示例ip地址
+ */
 public class IpLogConversionRule extends PropertyDefinerBase {
 
     @Override
