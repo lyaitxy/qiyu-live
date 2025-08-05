@@ -1,0 +1,129 @@
+package org.qiyu.live.living.provider.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.annotation.Resource;
+import org.qiyu.live.common.interfaces.dto.PageWrapper;
+import org.qiyu.live.common.interfaces.enums.CommonStatusEnum;
+import org.qiyu.live.common.interfaces.utils.ConvertBeanUtils;
+import org.qiyu.live.framework.redis.starter.key.LivingProviderCacheKeyBuilder;
+import org.qiyu.live.living.dto.LivingRoomReqDTO;
+import org.qiyu.live.living.dto.LivingRoomRespDTO;
+import org.qiyu.live.living.provider.dao.mapper.LivingRoomMapper;
+import org.qiyu.live.living.provider.dao.mapper.LivingRoomRecordMapper;
+import org.qiyu.live.living.provider.dao.po.LivingRoomPO;
+import org.qiyu.live.living.provider.dao.po.LivingRoomRecordPO;
+import org.qiyu.live.living.provider.service.ILivingRoomService;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Service
+public class LivingRoomServiceImpl implements ILivingRoomService {
+
+    @Resource
+    private LivingRoomMapper livingRoomMapper;
+    @Resource
+    private LivingRoomRecordMapper livingRoomRecordMapper;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private LivingProviderCacheKeyBuilder cacheKeyBuilder;
+
+    @Override
+    public Integer startLivingRoom(LivingRoomReqDTO livingRoomReqDTO) {
+        LivingRoomPO livingRoomPO = ConvertBeanUtils.convert(livingRoomReqDTO, LivingRoomPO.class);
+        livingRoomPO.setStartTime(new Date());
+        livingRoomPO.setStatus(CommonStatusEnum.VALID_STATUS.getCode());
+        livingRoomMapper.insert(livingRoomPO);
+        String cacheKey = cacheKeyBuilder.buildLivingRoomObj(livingRoomPO.getId());
+        // 防止之前有空值缓存，这里做移除操作
+        redisTemplate.delete(cacheKey);
+        return livingRoomPO.getId();
+    }
+
+    @Override
+    public boolean closeLiving(LivingRoomReqDTO livingRoomReqDTO) {
+        LivingRoomPO livingRoomPO = livingRoomMapper.selectById(livingRoomReqDTO.getRoomId());
+        if(livingRoomPO == null) {
+            return false;
+        }
+        if(!livingRoomReqDTO.getAnchorId().equals(livingRoomPO.getAnchorId())) {
+            return false;
+        }
+        LivingRoomRecordPO livingRoomRecordPO = ConvertBeanUtils.convert(livingRoomPO, LivingRoomRecordPO.class);
+        livingRoomRecordPO.setEndTime(new Date());
+        livingRoomRecordPO.setStatus(CommonStatusEnum.INVALID_STATUS.getCode());
+        livingRoomRecordMapper.insert(livingRoomRecordPO);
+        livingRoomMapper.deleteById(livingRoomPO.getId());
+        // 下播移除直播间擦车
+        String cacheKey = cacheKeyBuilder.buildLivingRoomObj(livingRoomReqDTO.getRoomId());
+        redisTemplate.delete(cacheKey);
+        return true;
+    }
+
+    @Override
+    public LivingRoomRespDTO queryByRoomId(Integer roomId) {
+        // 先查redis
+        String cacheKey = cacheKeyBuilder.buildLivingRoomObj(roomId);
+        LivingRoomRespDTO queryResult = (LivingRoomRespDTO) redisTemplate.opsForValue().get(cacheKey);
+        if (queryResult != null) {
+            // 防止空值缓存
+            if (queryResult.getId() != null) {
+                return null;
+            }
+            return queryResult;
+        }
+        LambdaQueryWrapper<LivingRoomPO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LivingRoomPO::getId, roomId);
+        queryWrapper.eq(LivingRoomPO::getStatus, CommonStatusEnum.VALID_STATUS.getCode());
+        queryWrapper.last("limit 1");
+        LivingRoomPO livingRoomPO = livingRoomMapper.selectOne(queryWrapper);
+        queryResult = ConvertBeanUtils.convert(livingRoomPO, LivingRoomRespDTO.class);
+        if(queryResult == null) {
+            // 防止缓存穿透
+            redisTemplate.opsForValue().set(cacheKey, new LivingRoomRespDTO(), 1L, TimeUnit.MINUTES);
+            return null;
+        }
+        redisTemplate.opsForValue().set(cacheKey, queryResult, 30, TimeUnit.MINUTES);
+        return queryResult;
+    }
+
+    @Override
+    public PageWrapper<LivingRoomRespDTO> list(LivingRoomReqDTO livingRoomReqDTO) {
+        // 因为直播平台同时在线直播人数不多，属于读多写小的场景，所以将其缓存进Redis进行提速
+        String cacheKey = cacheKeyBuilder.buildLivingRoomList(livingRoomReqDTO.getType());
+        int page = livingRoomReqDTO.getPage();
+        int pageSize = livingRoomReqDTO.getPageSize();
+        Long total = redisTemplate.opsForList().size(cacheKey);
+        List<Object> resultList = redisTemplate.opsForList().range(cacheKey, (long) (page - 1) * pageSize, (long) page * pageSize);
+        PageWrapper<LivingRoomRespDTO> pageWrapper = new PageWrapper<>();
+        if (CollectionUtils.isEmpty(resultList)) {
+            pageWrapper.setList(Collections.emptyList());
+            pageWrapper.setHasNext(false);
+        } else {
+            pageWrapper.setList(ConvertBeanUtils.convertList(resultList, LivingRoomRespDTO.class));
+            pageWrapper.setHasNext((long) page * pageSize < total);
+        }
+        return pageWrapper;
+    }
+
+    @Override
+    public List<LivingRoomRespDTO> listAllLivingRoomFromDB(Integer type) {
+        LambdaQueryWrapper<LivingRoomPO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LivingRoomPO::getType, type);
+        queryWrapper.eq(LivingRoomPO::getStatus, CommonStatusEnum.VALID_STATUS.getCode());
+        // 按照时间倒叙展示
+        queryWrapper.orderByDesc(LivingRoomPO::getStartTime);
+        // 为性能做保证，只查询1000个
+        queryWrapper.last("limit 1000");
+        return ConvertBeanUtils.convertList(livingRoomMapper.selectList(queryWrapper), LivingRoomRespDTO.class);
+    }
+
+
+}
