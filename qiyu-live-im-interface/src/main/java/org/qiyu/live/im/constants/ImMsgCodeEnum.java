@@ -6,7 +6,8 @@ public enum ImMsgCodeEnum {
     IM_LOGOUT_MSG(1002, "等出im消息包"),
     IM_BIZ_MSG(1003, "常规业务消息包"),
     IM_HEARTBEAT_MSG(1004, "im服务心跳消息包"),
-    IM_ACK_MSG(1005, "im服务的ACK消息包");
+    IM_ACK_MSG(1005, "im服务的ACK消息包"),
+    WS_SHARD_MSG(1000, "首次建立ws连接消息包");
 
     private int code;
     private String desc;

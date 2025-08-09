@@ -37,7 +37,7 @@ public class RefreshLivingRoomListJob implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         // 一秒种刷新一次直播间列表
-        SCHEDULED_THREAD_POOL_EXECUTOR.scheduleWithFixedDelay()
+        SCHEDULED_THREAD_POOL_EXECUTOR.scheduleWithFixedDelay(new RefreshCacheListJob(), 3000, 1000, TimeUnit.MILLISECONDS);
     }
 
     class RefreshCacheListJob implements Runnable {

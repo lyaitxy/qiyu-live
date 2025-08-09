@@ -4,6 +4,8 @@ import org.qiyu.live.common.interfaces.dto.PageWrapper;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.dto.LivingRoomRespDTO;
 
+import java.util.List;
+
 public interface ILivingRoomRpc {
 
     /**
@@ -25,4 +27,9 @@ public interface ILivingRoomRpc {
      * 直播间列表的分页查询
      */
     PageWrapper<LivingRoomRespDTO> list(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 支持根据roomId查询出批量的userId(set)存储
+     */
+    List<Long> queryUserIdsByRoomId(LivingRoomReqDTO livingRoomReqDTO);
 }

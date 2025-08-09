@@ -2,6 +2,8 @@ package org.qiyu.live.im.core.server.service;
 
 import org.qiyu.live.im.dto.ImMsgBody;
 
+import java.util.List;
+
 public interface IRouterHandlerService {
 
     /**

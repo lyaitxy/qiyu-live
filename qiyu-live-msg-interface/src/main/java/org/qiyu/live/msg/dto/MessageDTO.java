@@ -10,18 +10,30 @@ public class MessageDTO implements Serializable {
     private Long userId;
 
     /**
-     * 通信目标用户id
+     * 直播间id
      */
-    private Long objectId;
+    private Integer roomId;
 
     /**
      * 消息类型
      */
     private Integer type;
+
     /**
      * 消息内容
      */
     private String content;
+
+    /**
+     * 发送人名称
+     */
+    private String senderName;
+
+    /**
+     * 发送人头像
+     */
+    private String senderAvatar;
+
     private Date createTime;
     private Date updateTime;
 
@@ -30,11 +42,37 @@ public class MessageDTO implements Serializable {
         return "MessageDTO{" +
                 "content='" + content + '\'' +
                 ", userId=" + userId +
-                ", objectId=" + objectId +
+                ", roomId=" + roomId +
                 ", type=" + type +
+                ", senderName='" + senderName + '\'' +
+                ", senderAvatar='" + senderAvatar + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public String getSenderAvatar() {
+        return senderAvatar;
+    }
+
+    public void setSenderAvatar(String senderAvatar) {
+        this.senderAvatar = senderAvatar;
+    }
+
+    public Integer getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Integer roomId) {
+        this.roomId = roomId;
     }
 
     public String getContent() {
@@ -51,14 +89,6 @@ public class MessageDTO implements Serializable {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
-    }
-
-    public Long getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(Long objectId) {
-        this.objectId = objectId;
     }
 
     public Integer getType() {

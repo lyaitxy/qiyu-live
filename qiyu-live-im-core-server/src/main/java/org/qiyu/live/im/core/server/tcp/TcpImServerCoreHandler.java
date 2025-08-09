@@ -1,4 +1,4 @@
-package org.qiyu.live.im.core.server.handler;
+package org.qiyu.live.im.core.server.tcp;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,13 +7,14 @@ import jakarta.annotation.Resource;
 import org.qiyu.live.im.core.server.common.ChannelHandlerContextCache;
 import org.qiyu.live.im.core.server.common.ImContextUtils;
 import org.qiyu.live.im.core.server.common.ImMsg;
+import org.qiyu.live.im.core.server.handler.ImHandlerFactory;
 import org.qiyu.live.im.core.server.interfaces.constants.ImCoreServerConstants;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
 @ChannelHandler.Sharable  // 声明这个Handler是线程安全的，可以被多个Channel共享使用
-public class ImServerCoreHandler extends SimpleChannelInboundHandler {
+public class TcpImServerCoreHandler extends SimpleChannelInboundHandler {
 
     @Resource
     private ImHandlerFactory imHandlerFactory;

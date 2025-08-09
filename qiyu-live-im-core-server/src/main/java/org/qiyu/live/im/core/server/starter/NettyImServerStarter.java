@@ -11,15 +11,13 @@ import jakarta.annotation.Resource;
 import org.qiyu.live.im.core.server.common.ChannelHandlerContextCache;
 import org.qiyu.live.im.core.server.common.ImMsgDecoder;
 import org.qiyu.live.im.core.server.common.ImMsgEncoder;
-import org.qiyu.live.im.core.server.handler.ImServerCoreHandler;
+import org.qiyu.live.im.core.server.tcp.TcpImServerCoreHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import java.net.UnknownHostException;
 
 /**
  * Netty启动类
@@ -32,7 +30,7 @@ public class NettyImServerStarter implements InitializingBean {
     @Value("${qiyu.im.port}")
     private int port;
     @Resource
-    private ImServerCoreHandler imServerCoreHandler;
+    private TcpImServerCoreHandler imServerCoreHandler;
     @Resource
     private Environment environment;
 

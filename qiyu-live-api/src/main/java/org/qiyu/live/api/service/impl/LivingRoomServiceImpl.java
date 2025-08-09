@@ -1,5 +1,6 @@
 package org.qiyu.live.api.service.impl;
 
+import io.micrometer.common.util.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.qiyu.live.api.service.ILivingRoomService;
 import org.qiyu.live.api.vo.LivingRoomInitVO;
@@ -15,6 +16,10 @@ import org.qiyu.live.user.interfaces.IUserRpc;
 import org.qiyu.live.user.interfaces.dto.UserDTO;
 import org.qiyu.live.web.starter.context.QiyuRequestContext;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class LivingRoomServiceImpl implements ILivingRoomService {
@@ -47,20 +52,28 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
     @Override
     public LivingRoomInitVO anchorConfig(Long userId, Integer roomId) {
         LivingRoomRespDTO respDTO = livingRoomRpc.queryByRoomId(roomId);
-        LivingRoomInitVO initVO = new LivingRoomInitVO();
-        initVO.setUserId(userId);
+        // UserDTO userDTO = userRpc.getUserById(userId);
+        Map<Long, UserDTO> userDTOMap = userRpc.batchQueryUserInfo(Arrays.asList(respDTO.getAnchorId(), userId).stream().distinct().collect(Collectors.toList()));
+        UserDTO anchor = userDTOMap.get(respDTO.getAnchorId());
+        UserDTO watcher = userDTOMap.get(userId);
+        LivingRoomInitVO respVO = new LivingRoomInitVO();
+        respVO.setAnchorNickName(anchor.getNickName());
+        respVO.setWatcherNickName(watcher.getNickName());
+        respVO.setNickName(watcher.getNickName());
+        respVO.setUserId(userId);
+        respVO.setAvatar(StringUtils.isEmpty(anchor.getAvatar()) ? "https://s1.ax1x.com/2022/12/18/zb6q6f.png" : anchor.getAvatar());
+        respVO.setWatcherAvatar(StringUtils.isEmpty(watcher.getAvatar()) ? "https://s1.ax1x.com/2022/12/18/zb6q6f.png" : watcher.getAvatar());
+        respVO.setWatcherAvatar(watcher.getAvatar());
         if (respDTO == null || respDTO.getAnchorId() == null || userId == null) {
-            // 直播间不存在，设置roomId为-1
-            initVO.setRoomId(-1);
-        } else {
-            initVO.setRoomId(respDTO.getId());
-            initVO.setRoomName(respDTO.getRoomName());
-            initVO.setAnchorId(respDTO.getAnchorId());
-            initVO.setAnchor(respDTO.getAnchorId().equals(userId));
-            initVO.setAnchorImg(respDTO.getCovertImg());
-            initVO.setDefaultBgImg(respDTO.getCovertImg());
+            //直播间不存在，设置roomId为-1
+            respVO.setRoomId(-1);
+        }else {
+            respVO.setRoomId(respDTO.getId());
+            respVO.setAnchorId(respDTO.getAnchorId());
+            respVO.setAnchor(respDTO.getAnchorId().equals(userId));
         }
-        return initVO;
+        respVO.setDefaultBgImg("http://www.news.cn/photo/20250425/e2f1fb2690d74d099f6b5478be683fcc/ad07d300366b41b29df095f5f8946217.jpg");
+        return respVO;
     }
 
     @Override
