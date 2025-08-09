@@ -1,11 +1,14 @@
 package org.qiyu.live.api.controller;
 
 import jakarta.annotation.Resource;
+import org.qiyu.live.api.error.QiyuApiError;
 import org.qiyu.live.api.service.ILivingRoomService;
 import org.qiyu.live.api.vo.LivingRoomInitVO;
 import org.qiyu.live.api.vo.req.LivingRoomReqVO;
 import org.qiyu.live.common.interfaces.vo.WebResponseVO;
 import org.qiyu.live.web.starter.context.QiyuRequestContext;
+import org.qiyu.live.web.starter.error.BizBaseErrorEnum;
+import org.qiyu.live.web.starter.error.ErrorAssert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +33,7 @@ public class LivingRoomController {
 
     @PostMapping("/closeLiving")
     public WebResponseVO closeLiving(Integer roomId) {
-        if(roomId == null) return WebResponseVO.errorParam("需要给定直播间id");
+        ErrorAssert.isNotNull(roomId, BizBaseErrorEnum.PARAM_ERROR);
         boolean status = livingRoomService.closeLiving(roomId);
         if(status) {
             return WebResponseVO.success();
@@ -46,12 +49,8 @@ public class LivingRoomController {
 
     @PostMapping("list")
     public WebResponseVO list(LivingRoomReqVO livingRoomReqVO) {
-        if(livingRoomReqVO == null || livingRoomReqVO.getType() == null) {
-            return WebResponseVO.errorParam("需要给定直播间类型");
-        }
-        if (livingRoomReqVO.getPage() <= 0 || livingRoomReqVO.getPageSize() > 100) {
-            return WebResponseVO.errorParam("分页查询参数错误");
-        }
+        ErrorAssert.isTure(livingRoomReqVO != null || livingRoomReqVO.getType() != null, QiyuApiError.LIVING_ROOM_TYPE_MISSING);
+        ErrorAssert.isTure(livingRoomReqVO.getPage() > 0 || livingRoomReqVO.getPageSize() <= 100, BizBaseErrorEnum.PARAM_ERROR);
         return WebResponseVO.success(livingRoomService.list(livingRoomReqVO));
     }
 }
