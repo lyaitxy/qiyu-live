@@ -1,16 +1,13 @@
-package org.qiyu.live.msg.enums;
+package org.qiyu.live.bank.constants;
 
-/**
- * 消息类型
- */
-public enum ImMsgBizCodeEnum {
+public enum PayProductTypeEnum {
 
-    LIVING_ROOM_IM_CHAT_MSG_BIZ(5555, "直播间im聊天消息");
+    QIYU_COIN(0, "直播间充值-旗鱼虚拟币产品");
 
     int code;
     String desc;
 
-    ImMsgBizCodeEnum(int code, String desc) {
+    PayProductTypeEnum(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -22,5 +19,4 @@ public enum ImMsgBizCodeEnum {
     public String getDesc() {
         return desc;
     }
-
 }

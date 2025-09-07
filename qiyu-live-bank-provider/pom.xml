@@ -6,7 +6,7 @@
         <artifactId>qiyu-live-app</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>qiyu-live-gift-provider</artifactId>
+    <artifactId>qiyu-live-bank-provider</artifactId>
 
     <properties>
         <alibaba-fastjson.version>2.0.36</alibaba-fastjson.version>
@@ -84,25 +84,13 @@
         </dependency>
         <dependency>
             <groupId>org.idea</groupId>
-            <artifactId>qiyu-live-framework-mq-starter</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.idea</groupId>
             <artifactId>qiyu-live-bank-interface</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.idea</groupId>
-            <artifactId>qiyu-live-im-interface</artifactId>
+            <artifactId>qiyu-live-framework-mq-starter</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.idea</groupId>
-            <artifactId>qiyu-live-im-router-interface</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
-
 </project>

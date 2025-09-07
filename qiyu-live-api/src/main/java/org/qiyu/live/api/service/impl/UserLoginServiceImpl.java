@@ -5,7 +5,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.qiyu.live.account.interfaces.IAccountTokenRPC;
-import org.qiyu.live.api.error.QiyuApiError;
+import org.qiyu.live.api.error.ApiErrorEnum;
 import org.qiyu.live.api.service.IUserLoginService;
 import org.qiyu.live.api.vo.UserLoginVO;
 import org.qiyu.live.common.interfaces.utils.ConvertBeanUtils;
@@ -19,7 +19,6 @@ import org.qiyu.live.web.starter.error.ErrorAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
 
@@ -40,8 +39,8 @@ public class UserLoginServiceImpl implements IUserLoginService {
     @Override
     public WebResponseVO sendLoginCode(String phone) {
         // 参数校验
-        ErrorAssert.isNotNull(phone, QiyuApiError.PHONE_NOT_BLANK);
-        ErrorAssert.isTure(Pattern.matches(PHONE_REG, phone), QiyuApiError.PHONE_IN_VALID);
+        ErrorAssert.isNotNull(phone, ApiErrorEnum.PHONE_NOT_BLANK);
+        ErrorAssert.isTure(Pattern.matches(PHONE_REG, phone), ApiErrorEnum.PHONE_IN_VALID);
         MsgSendResultEnum msgSendResultEnum = smsRpc.sendLoginCode(phone);
         if (msgSendResultEnum == MsgSendResultEnum.SEND_SUCCESS) {
             return WebResponseVO.success();
@@ -52,9 +51,9 @@ public class UserLoginServiceImpl implements IUserLoginService {
     @Override
     public WebResponseVO login(String phone, Integer code, HttpServletResponse response) {
         // 参数校验
-        ErrorAssert.isNotNull(phone, QiyuApiError.PHONE_NOT_BLANK);
-        ErrorAssert.isTure(Pattern.matches(PHONE_REG, phone), QiyuApiError.PHONE_IN_VALID);
-        ErrorAssert.isTure(code != null || code >= 1000, QiyuApiError.LOGIN_CODE_IN_VALID);
+        ErrorAssert.isNotNull(phone, ApiErrorEnum.PHONE_NOT_BLANK);
+        ErrorAssert.isTure(Pattern.matches(PHONE_REG, phone), ApiErrorEnum.PHONE_IN_VALID);
+        ErrorAssert.isTure(code != null || code >= 1000, ApiErrorEnum.LOGIN_CODE_IN_VALID);
         // 检查验证码是否匹配
         MsgCheckDTO msgCheckDTO = smsRpc.checkLoginCode(phone, code);
         if (!msgCheckDTO.isCheckStatus()) {// 校验没通过

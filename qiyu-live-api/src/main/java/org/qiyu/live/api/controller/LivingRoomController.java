@@ -1,7 +1,7 @@
 package org.qiyu.live.api.controller;
 
 import jakarta.annotation.Resource;
-import org.qiyu.live.api.error.QiyuApiError;
+import org.qiyu.live.api.error.ApiErrorEnum;
 import org.qiyu.live.api.service.ILivingRoomService;
 import org.qiyu.live.api.vo.LivingRoomInitVO;
 import org.qiyu.live.api.vo.req.LivingRoomReqVO;
@@ -52,7 +52,7 @@ public class LivingRoomController {
 
     @PostMapping("list")
     public WebResponseVO list(LivingRoomReqVO livingRoomReqVO) {
-        ErrorAssert.isTure(livingRoomReqVO != null || livingRoomReqVO.getType() != null, QiyuApiError.LIVING_ROOM_TYPE_MISSING);
+        ErrorAssert.isTure(livingRoomReqVO != null || livingRoomReqVO.getType() != null, ApiErrorEnum.LIVING_ROOM_TYPE_MISSING);
         ErrorAssert.isTure(livingRoomReqVO.getPage() > 0 || livingRoomReqVO.getPageSize() <= 100, BizBaseErrorEnum.PARAM_ERROR);
         return WebResponseVO.success(livingRoomService.list(livingRoomReqVO));
     }

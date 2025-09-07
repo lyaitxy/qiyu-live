@@ -1,7 +1,6 @@
 package org.qiyu.live.msg.provider.consumer.handler.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.qiyu.live.im.constants.AppIdEnum;
 import org.qiyu.live.im.dto.ImMsgBody;
@@ -9,7 +8,7 @@ import org.qiyu.live.im.router.interfaces.ImRouterRpc;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.rpc.ILivingRoomRpc;
 import org.qiyu.live.msg.dto.MessageDTO;
-import org.qiyu.live.msg.enums.ImMsgBizCodeEnum;
+import org.qiyu.live.im.router.interfaces.enums.ImMsgBizCodeEnum;
 import org.qiyu.live.msg.provider.consumer.handler.MessageHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

@@ -7,3 +7,4 @@ org.qiyu.live.framework.redis.starter.key.ImProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.ImCoreServerProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.LivingProviderCacheKeyBuilder
 org.qiyu.live.framework.redis.starter.key.GiftProviderCacheKeyBuilder
+org.qiyu.live.framework.redis.starter.key.BankProviderCacheKeyBuilder
