@@ -1,6 +1,8 @@
 package org.qiyu.live.api.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.client.exception.MQBrokerException;
@@ -28,7 +30,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Service
 public class GiftServiceImpl implements IGiftService {
@@ -42,6 +47,8 @@ public class GiftServiceImpl implements IGiftService {
     @Resource
     private MQProducer mqProducer;
 
+    private Cache<Integer, GiftConfigDTO> giftConfigDTOCache = Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(90, TimeUnit.SECONDS).build();
+
     @Override
     public List<GiftConfigVO> listGift() {
         List<GiftConfigDTO> giftConfigDTOS = giftConfigRpc.queryGiftList();
@@ -51,8 +58,15 @@ public class GiftServiceImpl implements IGiftService {
     @Override
     public boolean send(GiftReqVO giftReqVO) {
         int giftId = giftReqVO.getGiftId();
+        // 先判断本地缓存中是否存在
+        GiftConfigDTO giftConfigDTO = giftConfigDTOCache.get(giftId, new Function<Integer, GiftConfigDTO>() {
+            @Override
+            public GiftConfigDTO apply(Integer integer) {
+                return giftConfigRpc.getByGiftId(giftId);
+            }
+        });
         // 根据礼物id判断礼物是否有效
-        GiftConfigDTO giftConfigDTO = giftConfigRpc.getByGiftId(giftId);
+//        GiftConfigDTO giftConfigDTO = giftConfigRpc.getByGiftId(giftId);
         ErrorAssert.isNotNull(giftConfigDTO, ApiErrorEnum.GIFT_CONFIG_ERROR);
 
         SendGiftMq sendGiftMq = new SendGiftMq();
@@ -61,6 +75,7 @@ public class GiftServiceImpl implements IGiftService {
         sendGiftMq.setRoomId(giftReqVO.getRoomId());
         sendGiftMq.setReceiverId(giftReqVO.getReceiverId());
         sendGiftMq.setUrl(giftConfigDTO.getSvgaUrl());
+        sendGiftMq.setType(giftReqVO.getType());
         sendGiftMq.setPrice(giftConfigDTO.getPrice());
         // 避免重复消费
         sendGiftMq.setUuid(UUID.randomUUID().toString());

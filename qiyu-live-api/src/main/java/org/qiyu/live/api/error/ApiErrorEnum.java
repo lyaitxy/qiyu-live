@@ -10,6 +10,7 @@ public enum ApiErrorEnum implements QiyuBaseError {
     LOGIN_CODE_IN_VALID(4, "验证码格式异常"),
     GIFT_CONFIG_ERROR(5, "礼物信息异常"),
     SEND_GIFT_ERROR(6, "礼物信息异常"),
+    PK_ONLINE_BUSY(7, "当前正有人连线，请稍后再试"),
     NOT_SEND_TO_YOURSELF(8, "目前正有人连线，不能给自己送礼");
 
     ApiErrorEnum(int code, String desc) {

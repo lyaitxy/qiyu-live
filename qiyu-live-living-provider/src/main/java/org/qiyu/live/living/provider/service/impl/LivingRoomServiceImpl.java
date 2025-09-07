@@ -1,14 +1,21 @@
 package org.qiyu.live.living.provider.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.qiyu.live.common.interfaces.dto.PageWrapper;
 import org.qiyu.live.common.interfaces.enums.CommonStatusEnum;
 import org.qiyu.live.common.interfaces.utils.ConvertBeanUtils;
 import org.qiyu.live.framework.redis.starter.key.LivingProviderCacheKeyBuilder;
+import org.qiyu.live.im.constants.AppIdEnum;
 import org.qiyu.live.im.core.server.interfaces.dto.ImOfflineDTO;
 import org.qiyu.live.im.core.server.interfaces.dto.ImOnlineDTO;
+import org.qiyu.live.im.dto.ImMsgBody;
+import org.qiyu.live.im.router.interfaces.ImRouterRpc;
+import org.qiyu.live.im.router.interfaces.enums.ImMsgBizCodeEnum;
+import org.qiyu.live.living.dto.LivingPKRespDTO;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.dto.LivingRoomRespDTO;
 import org.qiyu.live.living.provider.dao.mapper.LivingRoomMapper;
@@ -27,6 +34,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class LivingRoomServiceImpl implements ILivingRoomService {
@@ -39,6 +47,8 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
     private LivingProviderCacheKeyBuilder cacheKeyBuilder;
+    @DubboReference
+    private ImRouterRpc routerRpc;
 
     @Override
     public void userOnlineHandler(ImOnlineDTO imOnlineDTO) {
@@ -57,6 +67,11 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
         Integer roomId = imOfflineDTO.getRoomId();
         String cacheKey = cacheKeyBuilder.buildLivingRoomUserSet(roomId, appId);
         redisTemplate.opsForSet().remove(cacheKey, userId);
+        // 监听pk主播下线行为
+        LivingRoomReqDTO livingRoomReqDTO = new LivingRoomReqDTO();
+        livingRoomReqDTO.setRoomId(imOfflineDTO.getRoomId());
+        livingRoomReqDTO.setPkObjId(imOfflineDTO.getUserId());
+        this.offlinePk(livingRoomReqDTO);
     }
 
     @Override
@@ -163,5 +178,57 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
         return ConvertBeanUtils.convertList(livingRoomMapper.selectList(queryWrapper), LivingRoomRespDTO.class);
     }
 
+    @Override
+    public LivingPKRespDTO onlinePk(LivingRoomReqDTO livingRoomReqDTO) {
+        LivingRoomRespDTO livingRoomRespDTO = this.queryByRoomId(livingRoomReqDTO.getRoomId());
+        LivingPKRespDTO respDTO = new LivingPKRespDTO();
+        respDTO.setOnlineStatus(false);
+        if (livingRoomRespDTO.getAnchorId().equals(livingRoomReqDTO.getPkObjId())) {
+            respDTO.setMsg("主播不可以连线参与PK");
+            return respDTO;
+        }
+        String cacheKey = cacheKeyBuilder.buildLivingOnlinePk(livingRoomReqDTO.getRoomId());
+        // 使用setIfAbsent防止被后来者覆盖
+        Boolean tryOnline = redisTemplate.opsForValue().setIfAbsent(cacheKey, livingRoomReqDTO.getPkObjId(), 12L, TimeUnit.HOURS);
+        if (Boolean.TRUE.equals(tryOnline)) {
+            // 通知直播间所有人，有人上线PK了
+            List<Long> userIdList = this.queryUserIdsByRoomId(livingRoomReqDTO);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("pkObjId", livingRoomReqDTO.getPkObjId());
+            jsonObject.put("pkObjAvatar", "../svga/img/爱心.png");
+            this.batchSendImMsg(userIdList, ImMsgBizCodeEnum.LIVING_ROOM_PK_ONLINE.getCode(), jsonObject);
+            respDTO.setMsg("连线成功");
+            respDTO.setOnlineStatus(true);
+            return respDTO;
+        }
+        respDTO.setMsg("目前有人在线，请稍后再试");
+        return respDTO;
+    }
 
+    @Override
+    public boolean offlinePk(LivingRoomReqDTO livingRoomReqDTO) {
+        String cacheKey = cacheKeyBuilder.buildLivingOnlinePk(livingRoomReqDTO.getRoomId());
+        return Boolean.TRUE.equals(redisTemplate.delete(cacheKey));
+    }
+
+    @Override
+    public Long queryOnlinePkUserId(Integer roomId) {
+        String cacheKey = cacheKeyBuilder.buildLivingOnlinePk(roomId);
+        return (Long) redisTemplate.opsForValue().get(cacheKey);
+    }
+
+    /**
+     * 批量发送im消息
+     */
+    private void batchSendImMsg(List<Long> userIdList, Integer bizCode, JSONObject jsonObject) {
+        List<ImMsgBody> imMsgBodies = userIdList.stream().map(userId -> {
+            ImMsgBody imMsgBody = new ImMsgBody();
+            imMsgBody.setAppId(AppIdEnum.QIYU_LIVE_BIZ.getCode());
+            imMsgBody.setBizCode(bizCode);
+            imMsgBody.setData(jsonObject.toJSONString());
+            imMsgBody.setUserId(userId);
+            return imMsgBody;
+        }).collect(Collectors.toList());
+        routerRpc.batchSendMsg(imMsgBodies);
+    }
 }

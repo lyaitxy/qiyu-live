@@ -1,6 +1,7 @@
 package org.qiyu.live.living.rpc;
 
 import org.qiyu.live.common.interfaces.dto.PageWrapper;
+import org.qiyu.live.living.dto.LivingPKRespDTO;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.dto.LivingRoomRespDTO;
 
@@ -32,4 +33,22 @@ public interface ILivingRoomRpc {
      * 支持根据roomId查询出批量的userId(set)存储
      */
     List<Long> queryUserIdsByRoomId(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 当PK直播间连上线准备PK时，调用该请求
+     */
+    LivingPKRespDTO onlinePK(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 用户在pk直播间下线
+     *
+     * @param livingRoomReqDTO
+     * @return
+     */
+    boolean offlinePk(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 根据roomId查询当前pk人是谁
+     */
+    Long queryOnlinePkUserId(Integer roomId);
 }

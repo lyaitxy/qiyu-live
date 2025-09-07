@@ -3,6 +3,7 @@ package org.qiyu.live.living.provider.service;
 import org.qiyu.live.common.interfaces.dto.PageWrapper;
 import org.qiyu.live.im.core.server.interfaces.dto.ImOfflineDTO;
 import org.qiyu.live.im.core.server.interfaces.dto.ImOnlineDTO;
+import org.qiyu.live.living.dto.LivingPKRespDTO;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.dto.LivingRoomRespDTO;
 
@@ -60,4 +61,22 @@ public interface ILivingRoomService {
      * 从数据库中查找所有的直播间
      */
     List<LivingRoomRespDTO> listAllLivingRoomFromDB(Integer type);
+
+    /**
+     * 当PK直播间连上线准备PK时，调用该请求
+     */
+    LivingPKRespDTO onlinePk(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 用户在pk直播间下线
+     */
+    boolean offlinePk(LivingRoomReqDTO livingRoomReqDTO);
+
+    /**
+     * 根据roomId查询当前pk人是谁
+     *
+     * @param roomId
+     * @return
+     */
+    Long queryOnlinePkUserId(Integer roomId);
 }

@@ -5,7 +5,7 @@ public enum SendGiftTypeEnum {
     DEFAULT_SEND_GIFT(0, "直播间默认送礼物"),
     PK_SEND_GIFT(1, "直播间PK送礼物");
 
-    int code;
+    Integer code;
     String desc;
 
     SendGiftTypeEnum(int code, String desc) {
@@ -13,7 +13,7 @@ public enum SendGiftTypeEnum {
         this.desc = desc;
     }
 
-    public int getCode() {
+    public Integer getCode() {
         return code;
     }
 
