@@ -51,4 +51,9 @@ public interface ILivingRoomRpc {
      * 根据roomId查询当前pk人是谁
      */
     Long queryOnlinePkUserId(Integer roomId);
+
+    /**
+     * 根据主播id查找直播间
+     */
+    LivingRoomRespDTO queryByAnchorId(Long anchorId);
 }

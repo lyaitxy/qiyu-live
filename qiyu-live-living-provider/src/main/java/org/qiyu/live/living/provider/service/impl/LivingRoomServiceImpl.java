@@ -231,4 +231,13 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
         }).collect(Collectors.toList());
         routerRpc.batchSendMsg(imMsgBodies);
     }
+
+    @Override
+    public LivingRoomRespDTO queryByAnchorId(Long anchorId) {
+        LambdaQueryWrapper<LivingRoomPO> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LivingRoomPO::getAnchorId, anchorId);
+        queryWrapper.eq(LivingRoomPO::getStatus, CommonStatusEnum.VALID_STATUS.getCode());
+        queryWrapper.last("limit 1");
+        return ConvertBeanUtils.convert(livingRoomMapper.selectOne(queryWrapper), LivingRoomRespDTO.class);
+    }
 }

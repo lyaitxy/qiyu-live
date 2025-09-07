@@ -7,6 +7,7 @@ public class LivingRoomInitVO {
     private String anchorImg;
     private String roomName;
     private boolean isAnchor;
+    private String redPacketConfigCode;
     private String avatar;
     private Integer roomId;
     private String watcherNickName;
@@ -17,6 +18,14 @@ public class LivingRoomInitVO {
     private String defaultBgImg;
     private String nickName;
     private Long pkObjId;
+
+    public String getRedPacketConfigCode() {
+        return redPacketConfigCode;
+    }
+
+    public void setRedPacketConfigCode(String redPacketConfigCode) {
+        this.redPacketConfigCode = redPacketConfigCode;
+    }
 
     public Long getAnchorId() {
         return anchorId;
@@ -130,6 +139,7 @@ public class LivingRoomInitVO {
                 ", anchorImg='" + anchorImg + '\'' +
                 ", roomName='" + roomName + '\'' +
                 ", isAnchor=" + isAnchor +
+                ", redPacketConfigCode='" + redPacketConfigCode + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", roomId=" + roomId +
                 ", watcherNickName='" + watcherNickName + '\'' +

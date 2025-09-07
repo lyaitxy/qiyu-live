@@ -12,4 +12,9 @@ public class GiftProviderTopicNames {
      */
     public static final String SEND_GIFT = "send_gift";
 
+    /**
+     * 领取红包
+     */
+    public static final String RECEIVE_RED_PACKET = "receive_red_packet";
+
 }

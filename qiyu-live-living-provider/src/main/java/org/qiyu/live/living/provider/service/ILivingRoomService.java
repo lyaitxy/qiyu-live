@@ -79,4 +79,9 @@ public interface ILivingRoomService {
      * @return
      */
     Long queryOnlinePkUserId(Integer roomId);
+
+    /**
+     * 根据主播id查找直播间
+     */
+    LivingRoomRespDTO queryByAnchorId(Long anchorId);
 }
