@@ -12,6 +12,10 @@ public class RedisKeyBuilder {
         return SPLIT_ITEM;
     }
 
+    /**
+     * 前缀就是模块名加冒号
+     * @return
+     */
     public String getPrefix() {
         return applicationName + SPLIT_ITEM;
     }

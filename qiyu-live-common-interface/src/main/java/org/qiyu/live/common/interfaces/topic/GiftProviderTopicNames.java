@@ -17,4 +17,9 @@ public class GiftProviderTopicNames {
      */
     public static final String RECEIVE_RED_PACKET = "receive_red_packet";
 
+    /**
+     * 延迟回调，处理库存回滚问题
+     */
+    public static final String ROLL_BACK_STOCK = "roll_back_stock";
+
 }

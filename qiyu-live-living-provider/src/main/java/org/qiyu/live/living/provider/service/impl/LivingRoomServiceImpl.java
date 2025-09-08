@@ -1,10 +1,15 @@
 package org.qiyu.live.living.provider.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.apache.rocketmq.client.exception.MQBrokerException;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.client.producer.MQProducer;
+import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.qiyu.live.common.interfaces.dto.PageWrapper;
 import org.qiyu.live.common.interfaces.enums.CommonStatusEnum;
 import org.qiyu.live.common.interfaces.utils.ConvertBeanUtils;
@@ -15,6 +20,7 @@ import org.qiyu.live.im.core.server.interfaces.dto.ImOnlineDTO;
 import org.qiyu.live.im.dto.ImMsgBody;
 import org.qiyu.live.im.router.interfaces.ImRouterRpc;
 import org.qiyu.live.im.router.interfaces.enums.ImMsgBizCodeEnum;
+import org.qiyu.live.living.constants.LivingProviderTopicNames;
 import org.qiyu.live.living.dto.LivingPKRespDTO;
 import org.qiyu.live.living.dto.LivingRoomReqDTO;
 import org.qiyu.live.living.dto.LivingRoomRespDTO;
@@ -23,6 +29,8 @@ import org.qiyu.live.living.provider.dao.mapper.LivingRoomRecordMapper;
 import org.qiyu.live.living.provider.dao.po.LivingRoomPO;
 import org.qiyu.live.living.provider.dao.po.LivingRoomRecordPO;
 import org.qiyu.live.living.provider.service.ILivingRoomService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
@@ -39,6 +47,8 @@ import java.util.stream.Collectors;
 @Service
 public class LivingRoomServiceImpl implements ILivingRoomService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(LivingRoomServiceImpl.class);
+
     @Resource
     private LivingRoomMapper livingRoomMapper;
     @Resource
@@ -49,6 +59,8 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
     private LivingProviderCacheKeyBuilder cacheKeyBuilder;
     @DubboReference
     private ImRouterRpc routerRpc;
+    @Resource
+    private MQProducer mqProducer;
 
     @Override
     public void userOnlineHandler(ImOnlineDTO imOnlineDTO) {
@@ -97,7 +109,20 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
         String cacheKey = cacheKeyBuilder.buildLivingRoomObj(livingRoomPO.getId());
         // 防止之前有空值缓存，这里做移除操作
         redisTemplate.delete(cacheKey);
+        // 预热直播间商品的库存信息
+        this.sendStartingLivingRoomMq(livingRoomPO);
         return livingRoomPO.getId();
+    }
+
+    private void sendStartingLivingRoomMq(LivingRoomPO livingRoomPO) {
+        Message message = new Message();
+        message.setBody(JSON.toJSONBytes(livingRoomPO));
+        message.setTopic(LivingProviderTopicNames.START_LIVING_ROOM);
+        try {
+            mqProducer.send(message);
+        } catch (Exception e) {
+            LOGGER.error("[LivingRoomServiceImpl] starting living room and send mq error", e);
+        }
     }
 
     @Override
