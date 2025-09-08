@@ -31,6 +31,7 @@ public class ImRouterClusterInvoker<T> extends AbstractClusterInvoker<T> {
         if(matchInvoker == null) {
             throw new RuntimeException("ip is invalid");
         }
+        // 匹配上了，就转发到这台机器上
         return matchInvoker.invoke(invocation);
     }
 }

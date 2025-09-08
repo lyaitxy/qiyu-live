@@ -58,7 +58,7 @@ public class ImRouterServiceImpl implements ImRouterService {
             userIdMap.put(currentIp, currentUserIdList);
         });
         // 3. 按照IP地址对消息体进行分组
-        //根据注册IP对ImMsgBody进行分组
+        //根据注册IP对ImMsgBody进行分组P
         //将连接到同一台ip地址的ImMsgBody组装到一个List中，进行统一发送
         Map<Long, ImMsgBody> userIdMsgMap = imMsgBodyList.stream().collect(Collectors.toMap(ImMsgBody::getUserId, body -> body));
 
