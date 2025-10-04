@@ -88,8 +88,10 @@ public class SendGiftConsumer implements InitializingBean {
 
         defaultMQPushConsumer.setMessageListener((MessageListenerConcurrently) (msgs, context) -> {
             for (MessageExt msg : msgs) {
+                // 获取mq中的送礼信息
                 SendGiftMq sendGiftMq = JSON.parseObject(new String(msg.getBody()), SendGiftMq.class);
                 String cacheKey = cacheKeyBuilder.buildGiftConsumeKey(sendGiftMq.getUuid());
+                // 已经消费过了，不需要再次消费了
                 Boolean lockStatus = redisTemplate.opsForValue().setIfAbsent(cacheKey, -1, 5, TimeUnit.MINUTES);
                 if (!lockStatus){
                     // 代表曾经消费过
@@ -98,6 +100,7 @@ public class SendGiftConsumer implements InitializingBean {
                 AccountTradeReqDTO accountTradeReqDTO = new AccountTradeReqDTO();
                 accountTradeReqDTO.setUserId(sendGiftMq.getUserId());
                 accountTradeReqDTO.setNum(sendGiftMq.getPrice());
+                // 进行余额扣费
                 AccountTradeRespDTO accountTradeRespDTO = qiyuCurrentAccountRpc.consumeForSendGift(accountTradeReqDTO);
 
                 // 如果余额扣减成功
@@ -138,7 +141,7 @@ public class SendGiftConsumer implements InitializingBean {
     }
 
     /**
-     * 单想通知送礼对象
+     * 单独通知送礼对象
      */
     private void sendImMsgSingleton(Long userId, Integer bizCode, JSONObject jsonObject) {
         ImMsgBody imMsgBody = new ImMsgBody();
@@ -188,10 +191,11 @@ public class SendGiftConsumer implements InitializingBean {
         }
         Long pkUserId = livingRoomRespDTO.getAnchorId();
         // 1.3 获取当前进度条值 和 序列号
-        String pkNumKey = cacheKeyBuilder.buildLivingPkKey(roomId);
         Long pkNum = 0L;
         // 获取该条消息的序列号，避免消息乱序
         long sendGiftSeqNum = System.currentTimeMillis();
+        // 这个是当前pk直播间的缓存key
+        String pkNumKey = cacheKeyBuilder.buildLivingPkKey(roomId);
         if (sendGiftMq.getReceiverId().equals(pkUserId)) {
             // 收礼人是房主的话，进度条增加
             int moveStep = sendGiftMq.getPrice() / 10;

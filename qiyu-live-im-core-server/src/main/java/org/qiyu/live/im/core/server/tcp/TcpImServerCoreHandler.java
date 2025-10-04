@@ -37,10 +37,13 @@ public class TcpImServerCoreHandler extends SimpleChannelInboundHandler {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 从通道中拿到userId 和 appId
         Long userId = ImContextUtils.getUserId(ctx);
         Integer appId = ImContextUtils.getAppId(ctx);
         if(userId != null && appId != null) {
+            // 再根据userId缓存中移除这个ChannelHandlerContext
             ChannelHandlerContextCache.remove(userId);
+            // redis删除缓存
             redisTemplate.delete(ImCoreServerConstants.IM_BIND_IP_KEY + appId + ":" + userId);
         }
     }

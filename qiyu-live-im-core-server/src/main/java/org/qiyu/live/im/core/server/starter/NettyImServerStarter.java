@@ -64,6 +64,7 @@ public class NettyImServerStarter implements InitializingBean {
             if(StringUtils.isEmpty(registryIp) || StringUtils.isEmpty(registryPort)) {
                 throw new IllegalArgumentException("启动参数中的注册端口和注册ip不能为空");
             }
+            // 存入服务器的ip和端口
             ChannelHandlerContextCache.setServerIpAddress(registryIp+ ":" + registryPort);
             LOGGER.info("机器启动ip和dubbo服务端口为{}", registryIp + ":" + registryPort);
         } catch(Exception e) {

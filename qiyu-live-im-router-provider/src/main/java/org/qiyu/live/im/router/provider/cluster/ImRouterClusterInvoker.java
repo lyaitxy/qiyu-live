@@ -14,6 +14,14 @@ public class ImRouterClusterInvoker<T> extends AbstractClusterInvoker<T> {
         super(directory);
     }
 
+    /**
+     *  自定义为强制路由到某个ip的提供者
+     * @param invocation 一次远程调用的上下文信息,包含方法名，参数类型和值
+     * @param list 当前可用的服务提供者列表
+     * @param loadbalance 负载均衡策略
+     * @return
+     * @throws RpcException
+     */
     @Override
     protected Result doInvoke(Invocation invocation, List list, LoadBalance loadbalance) throws RpcException {
         checkWhetherDestroyed();

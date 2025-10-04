@@ -44,6 +44,7 @@ public class HeartBeatImMsgHandler implements SimpleHandler {
         // 心跳包record记录
         String redisKey = cacheKeyBuilder.buildImLoginTokenKey(userId, appId);
         this.recordOnlineTime(userId, redisKey);
+        // 删除过期的心跳记录
         this.removeExpireRecord(redisKey);
         redisTemplate.expire(redisKey, 5L, TimeUnit.MINUTES);
         //回写给客户端

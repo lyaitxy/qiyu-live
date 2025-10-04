@@ -45,7 +45,7 @@ public class ImRouterServiceImpl implements ImRouterService {
         // 需要对id进行分组，对相同服务器的UserIdList进行分组，每组进行一次调用，减少网络开销
         String cacheKeyPrefix = ImCoreServerConstants.IM_BIND_IP_KEY + imMsgBodyList.get(0).getAppId() + ":";
         List<String> cacheKeyList = imMsgBodyList.stream().map(ImMsgBody::getUserId).map(userId -> cacheKeyPrefix + userId).collect(Collectors.toList());
-        // 批量取出每个用户绑定的ip地址
+        // 批量取出每个用户绑定的服务器ip地址，在登录时已进行绑定
         List<String> ipList = stringRedisTemplate.opsForValue().multiGet(cacheKeyList);
         // 2. 解析ip列表，按ip地址对用户ID进行分组
         Map<String, List<Long>> userIdMap = new HashMap<>();

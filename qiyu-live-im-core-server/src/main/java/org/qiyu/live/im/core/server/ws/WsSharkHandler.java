@@ -78,6 +78,7 @@ public class WsSharkHandler extends ChannelInboundHandlerAdapter {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
             return;
         }
+        // http 升级为 WebSocket
         ChannelFuture channelFuture = webSocketServerHandshaker.handshake(ctx.channel(), msg);
         // 首次握手建立ws连接之后，返回一定的内容给客户端
         if (channelFuture.isSuccess()) {

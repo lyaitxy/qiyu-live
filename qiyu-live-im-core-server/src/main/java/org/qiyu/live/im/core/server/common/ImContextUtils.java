@@ -3,7 +3,7 @@ package org.qiyu.live.im.core.server.common;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
- * 封装 获取/存入 netty域信息的工具类
+ * 封装 获取/存入 netty域信息的工具类，生命周期是一次网络连接
  */
 public class ImContextUtils {
 

@@ -3,7 +3,7 @@ package org.qiyu.live.im.core.server.common;
 import io.netty.util.AttributeKey;
 
 /**
- * 保存netty的域信息
+ * Channel的属性键，保存netty的域信息
  */
 public class ImContextAttr {
     /**

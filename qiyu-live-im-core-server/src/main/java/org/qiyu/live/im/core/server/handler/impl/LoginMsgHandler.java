@@ -123,7 +123,9 @@ public class LoginMsgHandler implements SimpleHandler {
                 ChannelHandlerContextCache.getServerIpAddress() + "%" + userId,
                 2 * ImConstants.DEFAULT_HEART_BEAT_GAP, TimeUnit.SECONDS);
         LOGGER.info("[LoginMsgHandler] login success, userId is {}, appId is {}", userId, appId);
+        // 发送消息给客户端
         ctx.writeAndFlush(respMsg);
+        // 发送mq消息将用户上线信息存入redis
         sendLoginMQ(userId, appId, roomId);
     }
 }
