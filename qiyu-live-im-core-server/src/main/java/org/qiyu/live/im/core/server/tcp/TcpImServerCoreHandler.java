@@ -31,7 +31,7 @@ public class TcpImServerCoreHandler extends SimpleChannelInboundHandler {
     }
 
     /**
-     * 客户端正常或者意外掉线，都会触发这里
+     * 客户端正常或者意外掉线，都会触发这里，这里要去除缓存
      * @param ctx
      * @throws Exception
      */

@@ -51,7 +51,7 @@ public class QiyuCurrencyAccountServiceImpl implements QiyuCurrencyAccountServic
     @Override
     public void incr(Long userId, int num) {
         String cacheKey = cacheKeyBuilder.buildUserBalance(userId);
-        // 如果Redis中存在缓存，基于Redis的余额扣减
+        // 如果Redis中存在缓存，基于Redis的余额增加
         if (Boolean.TRUE.equals(redisTemplate.hasKey(cacheKey))) {
             redisTemplate.opsForValue().increment(cacheKey, num);
         }

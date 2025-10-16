@@ -69,7 +69,7 @@ public class RefreshLivingRoomListJob implements InitializingBean {
         for (LivingRoomRespDTO livingRoomRespDTO : resultList) {
             redisTemplate.opsForList().rightPush(tempListName, livingRoomRespDTO);
         }
-        // 直接修改重命名这个list，不要直接对原来的list进行修改，减少阻塞的影响
+        // 直接修改重命名这个list，不要直接对原来的list进行修改，减少阻塞的影响，原子操作，不会有中间状态，无锁刷新机制，旧的list会被新的list替换
         redisTemplate.rename(tempListName, cacheKey);
         redisTemplate.delete(tempListName);
     }

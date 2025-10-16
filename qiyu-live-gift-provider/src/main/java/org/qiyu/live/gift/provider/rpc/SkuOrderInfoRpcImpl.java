@@ -71,7 +71,7 @@ public class SkuOrderInfoRpcImpl implements ISkuOrderInfoRpc {
         // 进行商品库存的扣减, 这步操作后，id列表中只剩下了扣减库存成功的id
         while (iterator.hasNext()) {
             Long skuId = iterator.next();
-            boolean isSuccess = skuStockInfoService.decrStockNumBySkuId(skuId, 1);
+            boolean isSuccess = skuStockInfoService.decrStockNumBySkuIdByLua(skuId, 1);
             if (!isSuccess) iterator.remove();
         }
         SkuOrderInfoPO skuOrderInfoPO = skuOrderInfoService.insertOne(new SkuOrderInfoReqDTO(null, reqDTO.getUserId(), reqDTO.getRoomId(), SkuOrderInfoEnum.PREPARE_PAY.getCode(), skuIdList));
@@ -90,6 +90,7 @@ public class SkuOrderInfoRpcImpl implements ISkuOrderInfoRpc {
         Message message = new Message();
         message.setTopic(GiftProviderTopicNames.ROLL_BACK_STOCK);
         message.setBody(JSON.toJSONBytes(rollBackStockDTO));
+        // 半个小时
         message.setDelayTimeLevel(16);
         try {
             mqProducer.send(message);

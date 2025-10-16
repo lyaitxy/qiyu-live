@@ -38,7 +38,7 @@ public class SkuStockInfoRpcImpl implements ISkuStockInfoRpc {
     public boolean prepareStockInfo(Long anchorId) {
         List<Long> skuIdList = anchorShopInfoService.querySkuIdsByAnchorId(anchorId);
         List<SkuStockInfoPO> skuStockInfoPOS = skuStockInfoService.queryBySkuIds(skuIdList);
-        // 收集key和库存值
+        // 收集key和库存值，pipeline把多条命令一次性发送给Redis，减少网络往返次数
         Map<String, Integer> cacheKeyMap = skuStockInfoPOS.stream().collect(Collectors.toMap(skuStockInfoPO -> cacheKeyBuilder.buildSkuStock(skuStockInfoPO.getSkuId()), SkuStockInfoPO::getStockNum));
         redisTemplate.opsForValue().multiSet(cacheKeyMap);
         redisTemplate.executePipelined(new SessionCallback<Object>() {

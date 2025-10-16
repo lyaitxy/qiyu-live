@@ -40,6 +40,7 @@ public class RouterHandlerServiceImpl implements IRouterHandlerService {
     public boolean sendMsgToClient(ImMsgBody imMsgBody) {
         // 需要进行消息通知的userId
         Long userId = imMsgBody.getUserId();
+        // 获取到用户对应的channelContext
         ChannelHandlerContext ctx = ChannelHandlerContextCache.get(userId);
         // 消息到达时，对应客户端未下线
         if (ctx != null) {

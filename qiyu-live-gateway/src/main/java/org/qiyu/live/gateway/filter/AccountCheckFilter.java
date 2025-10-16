@@ -35,6 +35,12 @@ public class AccountCheckFilter implements GlobalFilter, Ordered {
     @Resource
     private GatewayApplicationProperties gatewayApplicationProperties;
 
+    /**
+     *
+     * @param exchange 包含整个HTTP请求和响应的上下文
+     * @param chain 过滤器链对象，通过chain.filter(exchange)放行
+     * @return
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 获取请求url.
@@ -81,6 +87,7 @@ public class AccountCheckFilter implements GlobalFilter, Ordered {
             return Mono.empty();
         }
         // gateway --> (header) --> springboot
+        // 将用户id放到请求头中
         ServerHttpRequest.Builder builder = request.mutate();
         builder.header(GatewayHeaderEnum.USER_LOGIN_ID.getName(), String.valueOf(userId));
         return chain.filter(exchange.mutate().request(builder.build()).build());

@@ -139,7 +139,7 @@ public class LivingRoomServiceImpl implements ILivingRoomService {
         livingRoomRecordPO.setStatus(CommonStatusEnum.INVALID_STATUS.getCode());
         livingRoomRecordMapper.insert(livingRoomRecordPO);
         livingRoomMapper.deleteById(livingRoomPO.getId());
-        // 下播移除直播间擦车
+        // 下播移除直播间缓存
         String cacheKey = cacheKeyBuilder.buildLivingRoomObj(livingRoomReqDTO.getRoomId());
         redisTemplate.delete(cacheKey);
         return true;

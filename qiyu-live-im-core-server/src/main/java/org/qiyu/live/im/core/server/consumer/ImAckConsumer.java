@@ -57,9 +57,12 @@ public class ImAckConsumer implements InitializingBean {
             }
             // 只支持一次重发
             if(retryTimes < 2) {
-                msgAckCheckService.recordMsgAck(imMsgBody, retryTimes + 1);
-                msgAckCheckService.sendDelayMsg(imMsgBody);
+                // 发送消息给客户端
                 routerHandlerService.sendMsgToClient(imMsgBody);
+                // 记录重试记录加1
+                msgAckCheckService.recordMsgAck(imMsgBody, retryTimes + 1);
+                // 再次重发消息
+                msgAckCheckService.sendDelayMsg(imMsgBody);
             } else {
                 msgAckCheckService.doMsgAck(imMsgBody);
             }

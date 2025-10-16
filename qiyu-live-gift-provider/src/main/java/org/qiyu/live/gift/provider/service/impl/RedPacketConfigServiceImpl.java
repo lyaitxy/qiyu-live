@@ -150,7 +150,7 @@ public class RedPacketConfigServiceImpl implements IRedPacketConfigService {
         sendRedPacketBO.setPrice(price);
         sendRedPacketBO.setReqDTO(redPacketConfigReqDTO);
         Message message = new Message();
-        message.setTopic(GiftProviderTopicNames.REMOVE_GIFT_CACHE);
+        message.setTopic(GiftProviderTopicNames.RECEIVE_RED_PACKET);
         message.setBody(JSON.toJSONBytes(sendRedPacketBO));
         try {
             SendResult sendResult = mqProducer.send(message);
@@ -199,6 +199,7 @@ public class RedPacketConfigServiceImpl implements IRedPacketConfigService {
         String totalGetPriceCacheKey = cacheKeyBuilder.buildRedPacketTotalGetPrice(code);
         // 记录该用户总共领取了多少金额的红包
         redisTemplate.opsForValue().increment(cacheKeyBuilder.buildUserTotalGetPrice(reqDTO.getUserId()), price);
+        // 记录红包的领取次数和领取的金额
         redisTemplate.opsForHash().increment(totalGetCountCacheKey, code, 1);
         redisTemplate.expire(totalGetCountCacheKey, 1L, TimeUnit.DAYS);
         redisTemplate.opsForHash().increment(totalGetPriceCacheKey, code, price);

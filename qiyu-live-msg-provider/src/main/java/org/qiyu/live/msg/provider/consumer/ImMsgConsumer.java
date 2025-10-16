@@ -37,6 +37,7 @@ public class ImMsgConsumer implements InitializingBean {
         mqPushConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         // 监听im发送过来的业务消息topic
         mqPushConsumer.subscribe(ImCoreServerProviderTopicNames.QIYU_LIVE_IM_BIZ_MSG_TOPIC, "");
+        // MessageListenerConcurrently表示并发消费，MessageListenerOrderly表示顺序消费
         mqPushConsumer.setMessageListener((MessageListenerConcurrently)(msgs, context) -> {
             for (MessageExt msg : msgs) {
                 ImMsgBody imMsgBody = JSON.parseObject(new String(msg.getBody()), ImMsgBody.class);
